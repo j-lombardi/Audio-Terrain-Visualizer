@@ -22,6 +22,15 @@ def plotsound(stream):
 
 if __name__ == "__main__":
     p = pyaudio.PyAudio()
+    dev_index = ''
+
+    # Gotta fix this -  need to identify the correct audio source as "Stereo Mix (Realtek(R)) Audio)"
+    for i in range(p.get_device_count()):
+        dev = p.get_device_info_by_index(i)
+        if dev['name'] == 'Stereo Mix (Realtek(R) Audio' and dev['hostApi'] == 0:
+            dev_index = dev['index'];
+
+    #stream = p.open(format=pyaudio.paInt16, channels=1, rate=RATE, input=True, input_device_index=dev_index, frames_per_buffer=CHUNK)
     stream = p.open(format=pyaudio.paInt16, channels=1, rate=RATE, input=True, frames_per_buffer=CHUNK)
 
     for i in range(int(20*RATE/CHUNK)):  # Do this for 10 seconds
