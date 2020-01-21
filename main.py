@@ -2,12 +2,12 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QLabel, QSizePolicy
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from mpl_toolkits.mplot3d import Axes3D # used for ploting 3d graphs
 
 import sys
 import numpy as np
 import noise
 import random
-import PlotCanvas
 
 MAP_SIZE = (512, 512)
 SCALE = 256
