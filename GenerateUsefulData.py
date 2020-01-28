@@ -17,9 +17,9 @@ while count <= len(song):
 
 # Returns:
 # np.ndarray of frequencies, np.ndarray of amount of each frequency
-bins = sound_list[0].fft()[0].astype(int)
+bins = sound_list[0].fft()[0].astype(float)
 
-freq = sound_list[17].fft()[1].astype(int)
+freq = sound_list[17].fft()[1].astype(float)
 
 bin_list = []
 freq_list = []
@@ -28,8 +28,9 @@ for i in sound_list:
     bin_list.append(bin)
     freq_list.append(freq)
 
-normal = (freq - min(freq))/(max(freq)-min(freq))
+normal_freq = abs(freq - min(freq))/(max(freq)-min(freq))
+normal_bins = abs(bins - min(bins))/(max(bins)-min(bins))
+for index, value in enumerate(freq):
+    print("%f | %f" %(bins[index], freq[index]))
+#print(normal_freq)
 
-print(freq.astype(float))
-play(sound_list[0])
-play(sound_list[17])
