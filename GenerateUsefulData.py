@@ -34,3 +34,6 @@ for index, value in enumerate(freq):
     print("%f | %f" %(bins[index], freq[index]))
 #print(normal_freq)
 
+print(freq.astype(float))
+play(sound_list[0])
+play(sound_list[17])
