@@ -94,6 +94,7 @@ class AudioPlayer(QMainWindow):
 
         controlLayout = QHBoxLayout()
         controlLayout.setContentsMargins(0, 0, 0, 0)
+        self.playButton.setShortcut("Space")
         controlLayout.addWidget(self.playButton)
         controlLayout.addWidget(self.positionSlider)
 
@@ -114,7 +115,9 @@ class AudioPlayer(QMainWindow):
 
     def openFile(self):
         song = QFileDialog.getOpenFileName(self, "Open Song", "~", "Sound Files (*.mp3 *.ogg *.wav *.m4a)")
-        self.songLabel.setText(song[0])
+        songName = song[0].split("/")
+        songName = songName[-1].split(".")
+        self.songLabel.setText(songName[0])
         if song[0] != '':
             url = QUrl.fromLocalFile(song[0])
             if self.playlist.mediaCount() == 0:
