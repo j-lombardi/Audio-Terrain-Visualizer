@@ -26,15 +26,24 @@ class AudioAnalysis:
 
     def get_next_splice(self):
         """
-
+        Splices the music from the current position through SELF.SECONDS, then updates position
         :return
-            splice:
+            splice: A cut of the song from self.SONG_TIME_POSITION through self.SONG_TIME_POSITION + self.SECONDS
         """
         splice = self.song[self.song_time_posistion:self.song_time_posistion + self.seconds]
         self.song_time_posistion += self.seconds
         return splice
 
     def get_useful_values(self):
+        """
+        Normalizes the data returned from freq in get_fft in order to make data more useful
+        Steps for normalization:
+            1) Slice full fft freq list into even sized lists
+            2) Average out each of those list slices
+            3) Append the averaged value to average_array
+        :return
+            average_array: List of averaged values reducing the huge freq array down to a much smaller list
+        """
         bins, freq = self.get_fft(self.get_next_splice())
         n_elements_per_slice = 220
         average_array = []
@@ -45,6 +54,12 @@ class AudioAnalysis:
         return average_array
 
     def splice_entire_song(self):
+        """
+        Splices the music up in its entirety and returns a list of all of the various splices. Splices are of
+        size/duration SELF.SECONDS
+        :return
+            song_list: The entire song cut into smaller portions of SELF.SECONDS duration
+        """
         song_list = []
         count = 0
         while count <= self.length:
