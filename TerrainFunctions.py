@@ -4,6 +4,7 @@ import time
 import threading
 from pydub.playback import play
 
+
 def create_map_empty():
     """
     Build an empty heighmap as a base to build blocks on
@@ -18,6 +19,7 @@ def create_map_empty():
             h = 1
             arr[i][j] = box(pos=vector(i, h / 2, j), length=1, width=1, height=h, color=color.cyan)
     return arr
+
 
 def shift(arr):
     """
@@ -69,9 +71,10 @@ def visualize(arr, mas):
     """
     play_song_thread = threading.Thread(target=play, args=(mas.song,))
     play_song_thread.start()
-    for i in range(0, mas.length - 1):
+    song_data = mas.normalize()
+    for i in song_data:
         start = time.time()
-        add_new_row(arr, mas.get_useful_values())
+        add_new_row(arr, i)
         timer = 0.5 - ((time.time() - start) % 60)
         if timer >= 0:
             time.sleep(timer)

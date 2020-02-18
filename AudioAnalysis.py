@@ -47,11 +47,49 @@ class AudioAnalysis:
         bins, freq = self.get_fft(self.get_next_splice())
         n_elements_per_slice = 220
         average_array = []
+
         for i in range(0, len(freq), n_elements_per_slice):
             slice_from_index = i
             slice_to_index = slice_from_index + n_elements_per_slice
-            average_array.append(np.mean(freq[slice_from_index:slice_to_index]))
+            average_array.append((np.log(np.mean(freq[slice_from_index:slice_to_index])) + 10) * 4)
         return average_array
+
+    def get_useful_values_by_splice(self, segment):
+        """
+        Normalizes the data returned from freq in get_fft in order to make data more useful
+        Steps for normalization:
+            1) Slice full fft freq list into even sized lists
+            2) Average out each of those list slices
+            3) Append the averaged value to average_array
+        :return
+            average_array: List of averaged values reducing the huge freq array down to a much smaller list
+        """
+        bins, freq = self.get_fft(segment)
+        n_elements_per_slice = 220
+        average_array = []
+
+        for i in range(0, len(freq), n_elements_per_slice):
+            slice_from_index = i
+            slice_to_index = slice_from_index + n_elements_per_slice
+            average_array.append((np.log(np.mean(freq[slice_from_index:slice_to_index])) + 10) * 4)
+        return average_array
+
+    def normalize(self):
+        fft_song_list = self.preload_song()
+        min_val = min(fft_song_list)
+        max_val = max(fft_song_list)
+        for x_count, segment in enumerate(fft_song_list):
+            for y_count, value in enumerate(segment):
+                fft_song_list[x_count][y_count] = (value - min_val) / (max_val - min_val)
+        return fft_song_list
+
+
+    def preload_song(self):
+        song_list = self.splice_entire_song()
+        fft_song_list = []
+        for segment in song_list:
+            fft_song_list.append(self.get_useful_values_by_splice(segment))
+        return fft_song_list
 
     def splice_entire_song(self):
         """
