@@ -80,6 +80,6 @@ def visualize(arr, mas):
             time.sleep(timer)
 
 
-ma = aa.AudioAnalysis("music/closer, the chainsmokers..mp3")
+ma = aa.AudioAnalysis("music/example_busta.mp3")
 blank_map = create_map_empty()
 visualize(blank_map, ma)

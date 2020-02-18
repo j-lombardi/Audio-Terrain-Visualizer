@@ -71,13 +71,13 @@ class AudioAnalysis:
         for i in range(0, len(freq), n_elements_per_slice):
             slice_from_index = i
             slice_to_index = slice_from_index + n_elements_per_slice
-            average_array.append((np.log(np.mean(freq[slice_from_index:slice_to_index])) + 10) * 4)
+            average_array.append(np.abs(np.log(np.mean(freq[slice_from_index:slice_to_index]))))
         return average_array
 
     def normalize(self):
         fft_song_list = self.preload_song()
-        min_val = min(fft_song_list)
-        max_val = max(fft_song_list)
+        min_val = min(map(min, fft_song_list))
+        max_val = max(map(max, fft_song_list))
         for x_count, segment in enumerate(fft_song_list):
             for y_count, value in enumerate(segment):
                 fft_song_list[x_count][y_count] = (value - min_val) / (max_val - min_val)
