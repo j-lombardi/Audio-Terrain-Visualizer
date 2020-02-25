@@ -72,14 +72,24 @@ def visualize(arr, mas):
     play_song_thread = threading.Thread(target=play, args=(mas.song,))
     play_song_thread.start()
     song_data = mas.normalize()
+
+    scene.autoscale = False
+    scene.camera.rotate(angle=55)
+    scene.camera.pos = vector(132, 15, 46)
+
+    #scene.userzoom = False
+    #scene.userspin = False
+    #scene.userpan = False
+
     for i in song_data:
         start = time.time()
         add_new_row(arr, i)
         timer = 0.5 - ((time.time() - start) % 60)
+        print(scene.camera.pos)
         if timer >= 0:
             time.sleep(timer)
 
 
-ma = aa.AudioAnalysis("music/example_busta.mp3")
+ma = aa.AudioAnalysis("music/ERRA - Dementia (Official Stream).mp3")
 blank_map = create_map_empty()
 visualize(blank_map, ma)

@@ -51,7 +51,7 @@ class AudioAnalysis:
         for i in range(0, len(freq), n_elements_per_slice):
             slice_from_index = i
             slice_to_index = slice_from_index + n_elements_per_slice
-            average_array.append((np.log(np.mean(freq[slice_from_index:slice_to_index])) + 10) * 4)
+            average_array.append(np.log(np.mean(freq[slice_from_index:slice_to_index])))
         return average_array
 
     def get_useful_values_by_splice(self, segment):
@@ -64,6 +64,17 @@ class AudioAnalysis:
         :return
             average_array: List of averaged values reducing the huge freq array down to a much smaller list
         """
+
+        '''
+        SUB BASS:   20 to 60 Hz     (Deep bass, felt more than it is heard)
+        BASS:       60 to 250 Hz    (Describes how fat/thin the sound is. Most in 90-200 range, 250ish for warm feel)
+        LOW MID:    250 to 500 Hz   (Low order harmonics, viewed as bass presence range)
+        MIDRANGE:   500 to 2 kHz    (Prominence of instrumentation in mix, high mids mean tinny sounds)
+        UPPER MID:  2 kHz to 4 kHz  (Very sensitive for human hearing, vocals usually in this range. Like a fire alarm)
+        PRESENCE:   4 kHz to 6 kHz  (Center for treble sounds in stereo systems)
+        BRILLIANCE  6 kHz to 20 kHz (Totally harmonics, responsible for sparkle and air of sound)
+        '''
+
         bins, freq = self.get_fft(segment)
         n_elements_per_slice = 220
         average_array = []
@@ -80,7 +91,7 @@ class AudioAnalysis:
         max_val = max(map(max, fft_song_list))
         for x_count, segment in enumerate(fft_song_list):
             for y_count, value in enumerate(segment):
-                fft_song_list[x_count][y_count] = (value - min_val) / (max_val - min_val)
+                fft_song_list[x_count][y_count] = (((value - min_val) / (max_val - min_val)) * 10)
         return fft_song_list
 
 
