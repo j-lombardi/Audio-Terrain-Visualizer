@@ -2,6 +2,7 @@ from vpython import *
 import AudioAnalysis as aa
 import time
 import threading
+import random
 from pydub.playback import play
 
 
@@ -46,8 +47,15 @@ def add_new_row(arr, arr2):
         No returns, updates the current output map with the new row and removes any extra rows on the end
     """
     shift(arr)
+    randomColor = vec(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+
     for i in range(0, 100):
         arr[0][i].height = arr2[i]
+        arr[0][i].color = randomColor
+        '''randomColor = vec(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
+        arr[0][i].color = randomColor'''
+
+        '''
         if arr[0][i].height > 45:
             arr[0][i].color = color.white
         elif arr[0][i].height > 10:
@@ -56,6 +64,8 @@ def add_new_row(arr, arr2):
             arr[0][i].color = color.cyan
         else:
             arr[0][i].color = color.red
+        '''
+
         arr[0][i].pos.y = arr[0][i].height / 2
 
 
@@ -70,8 +80,8 @@ def visualize(arr, mas):
         This will perform the audio visualization!
     """
     play_song_thread = threading.Thread(target=play, args=(mas.song,))
-    play_song_thread.start()
     song_data = mas.normalize()
+    play_song_thread.start()
 
     scene.autoscale = False
     scene.camera.rotate(angle=55)
@@ -85,11 +95,10 @@ def visualize(arr, mas):
         start = time.time()
         add_new_row(arr, i)
         timer = 0.5 - ((time.time() - start) % 60)
-        print(scene.camera.pos)
         if timer >= 0:
             time.sleep(timer)
 
 
-ma = aa.AudioAnalysis("music/ERRA - Dementia (Official Stream).mp3")
+ma = aa.AudioAnalysis("music/2. Kendrick Lamar - The Only Nigga.mp3")
 blank_map = create_map_empty()
 visualize(blank_map, ma)

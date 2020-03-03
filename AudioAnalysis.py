@@ -76,24 +76,51 @@ class AudioAnalysis:
         '''
 
         bins, freq = self.get_fft(segment)
-        n_elements_per_slice = 220
-        average_array = []
 
+        sub_bass = freq[0:60]
+        bass = freq[60:250]
+        low_mid = freq[250:500]
+        midrange = freq[500:2000]
+        upper_mid = freq[2000:4000]
+        presence = freq[4000:6000]
+        brilliance = freq[6000:]
+
+        sub_bass = self.average_freq_list(sub_bass)
+        bass = self.average_freq_list(bass)
+        low_mid = self.average_freq_list(low_mid)
+        midrange = self.average_freq_list(midrange)
+        upper_mid = self.average_freq_list(upper_mid)
+        presence = self.average_freq_list(presence)
+        brilliance = self.average_freq_list(brilliance)
+
+        full_list = sub_bass + bass + low_mid + midrange + upper_mid + presence + brilliance
+
+
+        return full_list
+
+
+    def normalize(self):
+        fft_song_list = self.preload_song()
+        #min_val = min(map(min, fft_song_list))
+        #max_val = max(map(max, fft_song_list))
+        #for x_count, segment in enumerate(fft_song_list):
+        #    for y_count, value in enumerate(segment):
+        #        fft_song_list[x_count][y_count] = (((value - min_val) / (max_val - min_val)) * 10)
+        return fft_song_list
+
+
+    def average_freq_list(self, freq):
+        n_elements_per_slice = round(len(freq) / 15)
+
+        if n_elements_per_slice is 0:
+            return [0]*15
+
+        average_array = []
         for i in range(0, len(freq), n_elements_per_slice):
             slice_from_index = i
             slice_to_index = slice_from_index + n_elements_per_slice
             average_array.append(np.abs(np.log(np.mean(freq[slice_from_index:slice_to_index]))))
         return average_array
-
-    def normalize(self):
-        fft_song_list = self.preload_song()
-        min_val = min(map(min, fft_song_list))
-        max_val = max(map(max, fft_song_list))
-        for x_count, segment in enumerate(fft_song_list):
-            for y_count, value in enumerate(segment):
-                fft_song_list[x_count][y_count] = (((value - min_val) / (max_val - min_val)) * 10)
-        return fft_song_list
-
 
     def preload_song(self):
         song_list = self.splice_entire_song()
