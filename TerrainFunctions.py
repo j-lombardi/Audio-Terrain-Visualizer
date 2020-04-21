@@ -2,8 +2,21 @@ from vpython import *
 import AudioAnalysis as aa
 import time
 import threading
-import random
 from pydub.playback import play
+
+# Define global color options
+brown = vec(0.545, 0.27, 0.074)
+base_color = color.blue
+ground_color = brown
+mid_color = color.green
+peak_color = color.white
+
+# Setting camera up
+scene.autoscale = True
+scene.camera.rotate(angle=55)
+scene.camera.pos = vector(132, 15, 46)
+scene.width = 1280
+scene.height = 800
 
 
 def create_map_empty():
@@ -18,7 +31,7 @@ def create_map_empty():
     for i in range(cols):
         for j in range(rows):
             h = 1
-            arr[i][j] = box(pos=vector(i, h / 2, j), length=1, width=1, height=h, color=color.cyan)
+            arr[i][j] = box(pos=vector(i, h / 2, j), axis=vector(10,1,15), length=1, width=1, height=h, color=color.cyan)
     return arr
 
 
@@ -47,24 +60,18 @@ def add_new_row(arr, arr2):
         No returns, updates the current output map with the new row and removes any extra rows on the end
     """
     shift(arr)
-    randomColor = vec(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
 
     for i in range(0, 100):
         arr[0][i].height = arr2[i]
-        arr[0][i].color = randomColor
-        '''randomColor = vec(random.uniform(0, 1), random.uniform(0, 1), random.uniform(0, 1))
-        arr[0][i].color = randomColor'''
 
-        '''
-        if arr[0][i].height > 45:
-            arr[0][i].color = color.white
-        elif arr[0][i].height > 10:
-            arr[0][i].color = color.green
-        elif arr[0][i].height > 2:
-            arr[0][i].color = color.cyan
+        if arr[0][i].height > 12:
+            arr[0][i].color = peak_color
+        elif arr[0][i].height > 6:
+            arr[0][i].color = mid_color
+        elif arr[0][i].height > 3:
+            arr[0][i].color = ground_color
         else:
-            arr[0][i].color = color.red
-        '''
+            arr[0][i].color = base_color
 
         arr[0][i].pos.y = arr[0][i].height / 2
 
@@ -83,22 +90,20 @@ def visualize(arr, mas):
     song_data = mas.normalize()
     play_song_thread.start()
 
-    scene.autoscale = False
-    scene.camera.rotate(angle=55)
-    scene.camera.pos = vector(132, 15, 46)
-
-    #scene.userzoom = False
-    #scene.userspin = False
-    #scene.userpan = False
-
+    # Visualize a new row every 0.5 seconds
     for i in song_data:
         start = time.time()
         add_new_row(arr, i)
-        timer = 0.5 - ((time.time() - start) % 60)
+        timer = 0.5 - ((time.time() - start) % 60)  # buffer loop in case it runs too fast
         if timer >= 0:
             time.sleep(timer)
 
 
-ma = aa.AudioAnalysis("music/2. Kendrick Lamar - The Only Nigga.mp3")
-blank_map = create_map_empty()
-visualize(blank_map, ma)
+def perform_3d_generation(file_path):
+    """
+    Main driver to combine all functionality of terrain generation and audio analysis.
+    :param file_path: File path of local mp3 or wav song file
+    """
+    ma = aa.AudioAnalysis(file_path)
+    blank_map = create_map_empty()
+    visualize(blank_map, ma)

@@ -3,11 +3,11 @@ import numpy as np
 
 
 class AudioAnalysis:
-    def __init__(self, filepath):
-        self.song = audiosegment.from_file(filepath)    # Song file loaded in with AudioSegment
+    def __init__(self, file_path):
+        self.song = audiosegment.from_file(file_path)    # Song file loaded in with AudioSegment
         self.length = len(self.song)                    # Length of song (in seconds)
         self.seconds = 0.5 * 1000                       # Used for time from milliseconds to seconds
-        self.song_time_posistion = 0                    # Tracker of posistion in time
+        self.song_time_position = 0                    # Tracker of position in time
 
     @staticmethod
     def get_fft(song_bite):
@@ -30,8 +30,8 @@ class AudioAnalysis:
         :return
             splice: A cut of the song from self.SONG_TIME_POSITION through self.SONG_TIME_POSITION + self.SECONDS
         """
-        splice = self.song[self.song_time_posistion:self.song_time_posistion + self.seconds]
-        self.song_time_posistion += self.seconds
+        splice = self.song[self.song_time_position:self.song_time_position + self.seconds]
+        self.song_time_position += self.seconds
         return splice
 
     def get_useful_values(self):
@@ -80,7 +80,7 @@ class AudioAnalysis:
         sub_bass = freq[0:60]
         bass = freq[60:250]
         low_mid = freq[250:500]
-        midrange = freq[500:2000]
+        mid_range = freq[500:2000]
         upper_mid = freq[2000:4000]
         presence = freq[4000:6000]
         brilliance = freq[6000:]
@@ -88,28 +88,35 @@ class AudioAnalysis:
         sub_bass = self.average_freq_list(sub_bass)
         bass = self.average_freq_list(bass)
         low_mid = self.average_freq_list(low_mid)
-        midrange = self.average_freq_list(midrange)
+        mid_range = self.average_freq_list(mid_range)
         upper_mid = self.average_freq_list(upper_mid)
         presence = self.average_freq_list(presence)
         brilliance = self.average_freq_list(brilliance)
 
-        full_list = sub_bass + bass + low_mid + midrange + upper_mid + presence + brilliance
-
+        full_list = sub_bass + bass + low_mid + mid_range + upper_mid + presence + brilliance
 
         return full_list
 
-
     def normalize(self):
+        """
+        Normalizes the data set of the full song data
+        :return
+            fft_song_list: list of normalized data
+        """
         fft_song_list = self.preload_song()
-        #min_val = min(map(min, fft_song_list))
-        #max_val = max(map(max, fft_song_list))
-        #for x_count, segment in enumerate(fft_song_list):
-        #    for y_count, value in enumerate(segment):
-        #        fft_song_list[x_count][y_count] = (((value - min_val) / (max_val - min_val)) * 10)
+        for x_count, segment in enumerate(fft_song_list):
+            for y_count, value in enumerate(segment):
+                fft_song_list[x_count][y_count] = value*2
         return fft_song_list
 
-
-    def average_freq_list(self, freq):
+    @staticmethod
+    def average_freq_list(freq):
+        """
+        Takes in a full list of frequencies and evenly averages the data into a new list of size 15
+        :param freq: list of frequency values
+        :return
+            average_array: frequency list divided into 15 bins with the composite average in each bins
+        """
         n_elements_per_slice = round(len(freq) / 15)
 
         if n_elements_per_slice is 0:
@@ -123,6 +130,11 @@ class AudioAnalysis:
         return average_array
 
     def preload_song(self):
+        """
+        Processes the entire song, turning it into useful numerical data
+        :return
+            fft_song_list: list of 0.5 second slices of the song in numerical form
+        """
         song_list = self.splice_entire_song()
         fft_song_list = []
         for segment in song_list:
